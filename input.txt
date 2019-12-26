@@ -1,0 +1,6 @@
+Circuitos com nao interessa pra nada
+V1 1 0 24
+V2 1 0 25
+V3 1 0 26
+V4 1 0 27
+.END
