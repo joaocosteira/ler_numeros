@@ -5,20 +5,17 @@
 #include <fcntl.h> /* O_RDONLY, O_WRONLY, O_CREAT, O_* */
 
 
-/*
-    Funcao que lê sobre cada linha o ultimo numero
-*/
 int getLastNumber(char* l){ //l é a linha recebida
-
     int numero;
     char delim[] = " "; //separar por espaços
-    char res[50];
+    char res[50]; //cada palavra lida tem de ter no maximo 50 caracteres
 
-    //Esta funcao guarda em ptr cada pedaços
-    char *ptr = strtok(l, delim);
-     while(ptr != NULL){ //quando termina a linha
-       strcpy(res,ptr); //guardo o pedaço encontrado
-		ptr = strtok(NULL, delim);   //procurar o proximo pedaço, é tipo num while fazer i++
+    
+    char *ptr = strtok(l, delim); //buscar primeira palavra da linha
+
+    while(ptr != NULL){ //Enquando a linha nao termina
+        strcpy(res,ptr); //guardo a palavra atual da linha
+	    ptr = strtok(NULL, delim);   //procurar a proxima palavra, é tipo num while fazer i++
   
     }
 
@@ -26,53 +23,51 @@ int getLastNumber(char* l){ //l é a linha recebida
     if((numero = atoi(res)) != 0)
         return numero;
     else
-    {
-        return(-1);
-    }
- 
-    return 0;
+        return -1 ;
 }
 
 
 
 int main(){
 
-    int numeros[10];
-    int indexn = 0;
+    int numeros[10]; //pode guardar 10 numeros no maximo
+    int indexn = 0; //index do array numeros
+    char c; //cada letra da linha
 
-	int fd = open("input.txt", O_RDONLY); //abre o ficheiro
+    //index e onde guardamos cada linha lida -> está definido pra linha de 1024 caracteres, podes meter + pequeno
+    int i=0; 
+    char aux[1024];
 
-	int n; 	
-    //se correu mal ao abrir o ficheiro					      
+    int res; //onde guarda cada numero lido temporariamente
+
+    int fd = open("input.txt", O_RDONLY); //abre o ficheiro	
+    
+    //Termina a execução caso nao haja o ficheiro				      
 	if (fd==-1){
 		perror("Can't open file");
 		close(fd);
-		return 1; /*EXIT_FAILURE*/
+		return 1;
 	}
-    //se correu bem abrir o ficheiro
+    //se correu bem abrir o ficheiro -> printf ou write
     else{
         printf("Abriu o ficheiro com sucesso\n");
     }
-	char c;
-    int i=0;
-    char aux[1024];
-    int res;
     //vou ler caracter a caracter
-	while((n=read(fd,&c,1))>0){
+	while(read(fd,&c,1)>0){
             aux[i++]=c; //vou guardando os caracteres da linha
-
             if(c=='\n'){    //quando chegar ao fim da linha
-                aux[i]='\0';
+                aux[i]='\0'; //Fim de linha
                 res=getLastNumber(aux); //vou procurar o numero na linha
                 //caso o numero é valido, guardo num array
                 if(res!= -1)
                     numeros[indexn++]=res;
-                i=0;
+                i=0; //reset da linha
             }
 
     }
-    //no array numeros, tenho todos os numeros lidos do ficheiro, aqui vou imprimir.
-    for(int j=0; j<indexn;j++)
+    close(fd); //IMPORTANTE: Fechar o ficheiro
+
+    for(int j=0; j<indexn;j++) //imprimir os numeros
         printf("%d\n",numeros[j]);
 
 	return 0;
